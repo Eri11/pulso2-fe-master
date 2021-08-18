@@ -20,7 +20,7 @@ import {
   NbToastrModule,
   NbWindowModule,
 } from '@nebular/theme';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+
 
 
 
@@ -42,7 +42,6 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     }),
     CoreModule.forRoot(),
     ThemeModule.forRoot(),
-    NgxChartsModule,
   ],
   bootstrap: [AppComponent],
 })

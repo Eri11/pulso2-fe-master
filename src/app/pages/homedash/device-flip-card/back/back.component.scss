@@ -1,33 +1,42 @@
 @import '../../../../@theme/styles/themes';
-@import '~bootstrap/scss/mixins/breakpoints';
-@import '~@nebular/theme/styles/global/breakpoints';
 @include nb-install-component() {
-    ngx-earning-pie-chart,
-    .chart-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    .title {
+        padding-left: 0.5rem;
+    }
+    nb-card-body {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        overflow: hidden;
+    }
+    .info {
+        display: flex;
+        @include nb-rtl(flex-direction, row-reverse);
+        justify-content: space-between;
+        padding: 0.75rem 0.75rem 0.5rem;
+    }
+    .period {
+        width: 49%;
+    }
+    .currency {
+        padding-right: 0.25rem;
+    }
+    ngx-back-profile-chart {
         flex: 1;
-    }
-    .chart-info {
-        padding-top: 0.7rem;
-    }
-    .time-period {
-        margin-top: 1.5rem;
-    }
-    .value {
-        margin-top: 0.2rem;
-    }
-    .echart {
-        position: absolute;
-        width: calc(50% - 1.25rem);
-        height: calc(100% - 2rem);
-    }
-    @include media-breakpoint-between(xl, xl) {
-        ngx-earning-pie-chart {
-            flex: 2;
-        }
-    }
-    @include media-breakpoint-between(sm, sm) {
-        ngx-earning-pie-chart {
-            flex: 2;
+        position: relative;
+         ::ng-deep {
+            .echart {
+                position: absolute;
+                height: 100%;
+                width: 100%;
+            }
+            canvas {
+                border-bottom-left-radius: nb-theme(card-border-radius);
+                border-bottom-right-radius: nb-theme(card-border-radius);
+            }
         }
     }
 }

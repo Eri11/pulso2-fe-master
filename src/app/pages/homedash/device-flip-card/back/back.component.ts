@@ -1,18 +1,30 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { StatsBarData } from '../../../../@core/data/stats-bar';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'ngx-device-back',
   templateUrl: './back.component.html',
   styleUrls: ['./back.component.scss'],
-  /* template: `
-    <div echarts
-         class="echart"
-         [options]="options"
-         (chartInit)="onChartInit($event)"
-         (chartClick)="onChartClick($event)">
-    </div>
-  `, */
-  changeDetection: ChangeDetectionStrategy.OnPush,  
+  
+ // changeDetection: ChangeDetectionStrategy.OnPush,  
   
 })
-export class BackComponent {}
+export class BackComponent implements OnDestroy {
+
+  private alive = true;
+
+  chartData: number[];
+
+  constructor(private statsBarData: StatsBarData) {
+    this.statsBarData.getStatsBarData()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe((data) => {
+        this.chartData = data;
+      });
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
+  }
+}

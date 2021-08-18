@@ -1,11 +1,21 @@
 <nb-card-header>
-    Earnings
+    <i class="ion-social-usd"></i>
+    <span class="title">Profit</span>
 </nb-card-header>
 <nb-card-body>
-    <div class="chart-info">
-        <div>Name</div>
-        <div class="time-period caption">Last week:</div>
-        <div class="h6">Value%</div>
+    <div class="info">
+        <div class="period">
+            <div class="caption">Jun 1 - Jun 30</div>
+            <div class="label">
+                <span class="currency">$</span>300
+            </div>
+        </div>
+        <div class="period latest">
+            <div class="caption">Jul 1 - Jul 31</div>
+            <div class="label">
+                <span class="currency">$</span>860
+            </div>
+        </div>
     </div>
-    <h1>piechart/profile</h1>
+    <ngx-back-profile-chart [points]="chartData"></ngx-back-profile-chart>
 </nb-card-body>

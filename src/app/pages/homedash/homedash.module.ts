@@ -1,16 +1,20 @@
 import { NgModule } from '@angular/core';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NbCardModule, NbUserModule, NbButtonModule, NbIconModule, NbTabsetModule, NbSelectModule, NbListModule, NbFlipCardComponent, NbCardComponent, NbProgressBarModule } from '@nebular/theme';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { ChartModule } from 'angular2-chartjs';
-import { NgxEchartsModule } from 'ngx-echarts';
+
 import { ThemeModule } from '../../@theme/theme.module';
 import { DeviceFlipCardComponent } from './device-flip-card/device-flip-card.component';
 import { HomedashComponent } from './homedash.component';
 import { FrontComponent } from './device-flip-card/front/front.component';
 import { BackComponent } from './device-flip-card/back/back.component';
 import { AddButtonCardComponent } from './add-button-card/add-button-card.component';
-import { LiveStatsChartComponent } from './device-flip-card/live-stats-chart/live-stats-chart.component';
+import { FrontLiveStatsChartComponent } from './device-flip-card/front/front-live-stats-chart.component';
+import { BackProfileChartComponent } from './device-flip-card/back/back-profile-chart.component';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { ChartModule } from 'angular2-chartjs';
+import { NgxEchartsModule } from 'ngx-echarts';
+
+
 
 
 
@@ -24,15 +28,15 @@ import { LiveStatsChartComponent } from './device-flip-card/live-stats-chart/liv
     NbTabsetModule,
     NbSelectModule,
     NbListModule,
-    ChartModule,
     NbProgressBarModule,
-    NgxEchartsModule,
-    NgxChartsModule,
     LeafletModule,
    
-    NgxChartsModule
     
 
+    ChartModule,
+    NgxEchartsModule,
+    NgxChartsModule,
+    LeafletModule 
   ],
   declarations: [
     HomedashComponent,
@@ -40,11 +44,23 @@ import { LiveStatsChartComponent } from './device-flip-card/live-stats-chart/liv
     FrontComponent,
     BackComponent,
     AddButtonCardComponent,
-    LiveStatsChartComponent,
+
+    DeviceFlipCardComponent,
+    FrontComponent,
+    FrontLiveStatsChartComponent,
+    BackComponent,
+    BackProfileChartComponent
     
+
   ],
   exports: [
-    LiveStatsChartComponent
+    DeviceFlipCardComponent,
+    FrontComponent,
+    FrontLiveStatsChartComponent,
+    BackComponent,
+    BackProfileChartComponent
+    
+
   ],
 
 })

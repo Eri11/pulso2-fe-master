@@ -8,6 +8,8 @@ import { MiscellaneousModule } from './miscellaneous/miscellaneous.module';
 import { HomedashModule } from './homedash/homedash.module';
 import { DirectorioModule } from './directorio/directorio.module';
 
+
+
 @NgModule({
   imports: [
     PagesRoutingModule,
@@ -22,6 +24,8 @@ import { DirectorioModule } from './directorio/directorio.module';
   ],
   declarations: [
     PagesComponent,
+
+    //Placehlder for chartcomp
   ],
 })
 export class PagesModule {

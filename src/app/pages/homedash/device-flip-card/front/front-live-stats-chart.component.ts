@@ -1,64 +1,154 @@
-import { Component } from '@angular/core';
-/* import { Chart, ChartDataset, ChartOptions } from 'chart.js';
-import 'chartjs-adapter-luxon';
-import StreamingPlugin from 'chartjs-plugin-streaming'; */
-import * as Chart from 'chart.js';
-
-
-Chart.apply(re)
+import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
+import { NbThemeService } from '@nebular/theme';
+import { takeWhile } from 'rxjs/operators';
+import { LayoutService } from '../../../../@core/utils';
 
 @Component({
-  selector: 'ngx-front-stats-chart',
-  styleUrls: ['./front.component.scss'],
-  /* template: `
-  <div>
-  <canvas
-    baseChart
-    [type]="'line'"
-    [datasets]="datasets"
-    [options]="options">
-  </canvas>
-</div> 
-  `,*/
+  selector: 'ngx-front-stats-animation-chart',
+  template: `
+    <div echarts
+         [options]="options"
+         class="echart"
+         (chartInit)="onChartInit($event)">
+    </div>
+  `,
 })
 
-export class FrontLiveStatsChartComponent {
+export class FrontLiveStatsChartComponent implements AfterViewInit, OnDestroy  {
 
-  options: Object;   label: 'Dataset 1',
-    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-    borderColor: 'rgb(255, 99, 132)',
-    borderDash: [8, 4],
-    fill: true,
-    data: []
-  }, {
-    label: 'Dataset 2',
-    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-    borderColor: 'rgb(54, 162, 235)',
-    cubicInterpolationMode: 'monotone',
-    fill: true,
-    data: []
-  }];
-  public options: ChartOptions = {
-    scales: {
-      x: {
-        type: 'realtime',
-        realtime: {
-          delay: 2000,
-          onRefresh: (chart: Chart) => {
-            chart.data.datasets.forEach((dataset: ChartDataset) => {
-              dataset.data.push({
-                x: Date.now(),
-                y: Math.random()
-              });
-            });
-          }
-        }
-      }
-    }
+  private alive = true;
+
+  @Input() linesData: { firstLine: number[]; secondLine: number[] } = {
+    firstLine: [],
+    secondLine: [],
   };
-}
-}
 
-function StreamingPlugin(StreamingPlugin: any) {
-  throw new Error('Function not implemented.');
+  echartsInstance: any;
+  options: any = {};
+
+  constructor(private theme: NbThemeService,
+              private layoutService: LayoutService) {
+    this.layoutService.onSafeChangeLayoutSize()
+      .pipe(
+        takeWhile(() => this.alive),
+      )
+      .subscribe(() => this.resizeChart());
+  }
+
+  ngAfterViewInit() {
+    this.theme.getJsTheme()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(config => {
+        const profitBarAnimationEchart: any = config.variables.profitBarAnimationEchart;
+
+        this.setChartOption(profitBarAnimationEchart);
+    });
+  }
+
+  setChartOption(chartVariables) {
+    this.options = {
+      color: [
+        chartVariables.firstAnimationBarColor,
+        chartVariables.secondAnimationBarColor,
+      ],
+      grid: {
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+      },
+      legend: {
+        data: ['transactions', 'orders'],
+        borderWidth: 0,
+        borderRadius: 0,
+        itemWidth: 15,
+        itemHeight: 15,
+        textStyle: {
+          color: chartVariables.textColor,
+        },
+      },
+      tooltip: {
+        axisPointer: {
+          type: 'shadow',
+        },
+        textStyle: {
+          color: chartVariables.tooltipTextColor,
+          fontWeight: chartVariables.tooltipFontWeight,
+          fontSize: chartVariables.tooltipFontSize,
+        },
+        position: 'top',
+        backgroundColor: chartVariables.tooltipBg,
+        borderColor: chartVariables.tooltipBorderColor,
+        borderWidth: chartVariables.tooltipBorderWidth,
+        formatter: params => `$ ${Math.round(parseInt(params.value, 10))}`,
+        extraCssText: chartVariables.tooltipExtraCss,
+      },
+      xAxis: [
+        {
+          data: this.linesData.firstLine.map((_, index) => index),
+          silent: false,
+          axisLine: {
+            show: false,
+          },
+          axisLabel: {
+            show: false,
+          },
+          axisTick: {
+            show: false,
+          },
+        },
+      ],
+      yAxis: [
+        {
+          axisLine: {
+            show: false,
+          },
+          axisLabel: {
+            show: false,
+          },
+          axisTick: {
+            show: false,
+          },
+          splitLine: {
+            show: true,
+            lineStyle: {
+              color: chartVariables.splitLineStyleColor,
+              opacity: chartVariables.splitLineStyleOpacity,
+              width: chartVariables.splitLineStyleWidth,
+            },
+          },
+        },
+      ],
+      series: [
+        {
+          name: 'transactions',
+          type: 'bar',
+          data: this.linesData.firstLine,
+          animationDelay: idx => idx * 10,
+        },
+        {
+          name: 'orders',
+          type: 'bar',
+          data: this.linesData.secondLine,
+          animationDelay: idx => idx * 10 + 100,
+        },
+      ],
+      animationEasing: 'elasticOut',
+      animationDelayUpdate: idx => idx * 5,
+    };
+  }
+
+  onChartInit(echarts) {
+    this.echartsInstance = echarts;
+  }
+
+  resizeChart() {
+    if (this.echartsInstance) {
+      this.echartsInstance.resize();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.alive = false;
+  }
 }
