@@ -20,6 +20,9 @@ import {
   NbToastrModule,
   NbWindowModule,
 } from '@nebular/theme';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -39,6 +42,7 @@ import {
     }),
     CoreModule.forRoot(),
     ThemeModule.forRoot(),
+    NgxChartsModule,
   ],
   bootstrap: [AppComponent],
 })

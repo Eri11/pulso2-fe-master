@@ -10,6 +10,7 @@ import { HomedashComponent } from './homedash.component';
 import { FrontComponent } from './device-flip-card/front/front.component';
 import { BackComponent } from './device-flip-card/back/back.component';
 import { AddButtonCardComponent } from './add-button-card/add-button-card.component';
+import { LiveStatsChartComponent } from './device-flip-card/live-stats-chart/live-stats-chart.component';
 
 
 
@@ -29,6 +30,7 @@ import { AddButtonCardComponent } from './add-button-card/add-button-card.compon
     NgxChartsModule,
     LeafletModule,
    
+    NgxChartsModule
     
 
   ],
@@ -38,10 +40,11 @@ import { AddButtonCardComponent } from './add-button-card/add-button-card.compon
     FrontComponent,
     BackComponent,
     AddButtonCardComponent,
+    LiveStatsChartComponent,
     
   ],
   exports: [
-    
+    LiveStatsChartComponent
   ],
 
 })

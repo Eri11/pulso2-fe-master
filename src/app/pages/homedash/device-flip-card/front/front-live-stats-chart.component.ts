@@ -1,165 +1,64 @@
-import { delay, takeWhile } from 'rxjs/operators';
-import { AfterViewInit, Component, Input, OnChanges, OnDestroy } from '@angular/core';
-import { NbThemeService } from '@nebular/theme';
-import { LayoutService } from '../../../../@core/utils/layout.service';
+import { Component } from '@angular/core';
+/* import { Chart, ChartDataset, ChartOptions } from 'chart.js';
+import 'chartjs-adapter-luxon';
+import StreamingPlugin from 'chartjs-plugin-streaming'; */
+import * as Chart from 'chart.js';
+
+
+Chart.apply(re)
 
 @Component({
   selector: 'ngx-front-stats-chart',
   styleUrls: ['./front.component.scss'],
-  template: `
-    <div echarts
-         class="echart"
-         [options]="option"
-         (chartInit)="onChartInit($event)"></div>
-  `,
+  /* template: `
+  <div>
+  <canvas
+    baseChart
+    [type]="'line'"
+    [datasets]="datasets"
+    [options]="options">
+  </canvas>
+</div> 
+  `,*/
 })
 
-export class FrontLiveStatsChartComponent implements AfterViewInit, OnDestroy, OnChanges {
-  private alive = true;
+export class FrontLiveStatsChartComponent {
 
-  @Input() liveUpdateChartData: { value: [string, number] }[];
-
-  option: any;
-  echartsInstance;
-
-  constructor(private theme: NbThemeService,
-              private layoutService: LayoutService) {
-    this.layoutService.onSafeChangeLayoutSize()
-      .pipe(
-        takeWhile(() => this.alive),
-      )
-      .subscribe(() => this.resizeChart());
-  }
-
-  ngOnChanges(): void {
-    if (this.option) {
-      this.updateChartOptions(this.liveUpdateChartData);
+  options: Object;   label: 'Dataset 1',
+    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+    borderColor: 'rgb(255, 99, 132)',
+    borderDash: [8, 4],
+    fill: true,
+    data: []
+  }, {
+    label: 'Dataset 2',
+    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+    borderColor: 'rgb(54, 162, 235)',
+    cubicInterpolationMode: 'monotone',
+    fill: true,
+    data: []
+  }];
+  public options: ChartOptions = {
+    scales: {
+      x: {
+        type: 'realtime',
+        realtime: {
+          delay: 2000,
+          onRefresh: (chart: Chart) => {
+            chart.data.datasets.forEach((dataset: ChartDataset) => {
+              dataset.data.push({
+                x: Date.now(),
+                y: Math.random()
+              });
+            });
+          }
+        }
+      }
     }
-  }
+  };
+}
+}
 
-  ngAfterViewInit() {
-    this.theme.getJsTheme()
-      .pipe(
-        delay(1),
-        takeWhile(() => this.alive),
-      )
-      .subscribe(config => {
-        const earningLineTheme: any = config.variables.earningLine;
-
-        this.setChartOption(earningLineTheme);
-      });
-  }
-
-  setChartOption(earningLineTheme) {
-    this.option = {
-      grid: {
-        left: 0,
-        top: 0,
-        right: 0,
-        bottom: 0,
-      },
-      xAxis: {
-        type: 'time',
-        axisLine: {
-          show: false,
-        },
-        axisLabel: {
-          show: false,
-        },
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          show: false,
-        },
-      },
-      yAxis: {
-        boundaryGap: [0, '5%'],
-        axisLine: {
-          show: false,
-        },
-        axisLabel: {
-          show: false,
-        },
-        axisTick: {
-          show: false,
-        },
-        splitLine: {
-          show: false,
-        },
-      },
-      tooltip: {
-        axisPointer: {
-          type: 'shadow',
-        },
-        textStyle: {
-          color: earningLineTheme.tooltipTextColor,
-          fontWeight: earningLineTheme.tooltipFontWeight,
-          fontSize: earningLineTheme.tooltipFontSize,
-        },
-        position: 'top',
-        backgroundColor: earningLineTheme.tooltipBg,
-        borderColor: earningLineTheme.tooltipBorderColor,
-        borderWidth: earningLineTheme.tooltipBorderWidth,
-        formatter: params => `$ ${Math.round(parseInt(params.value[1], 10))}`,
-        extraCssText: earningLineTheme.tooltipExtraCss,
-      },
-      series: [
-        {
-          type: 'line',
-          symbol: 'circle',
-          sampling: 'average',
-          itemStyle: {
-            normal: {
-              opacity: 0,
-            },
-            emphasis: {
-              opacity: 0,
-            },
-          },
-          lineStyle: {
-            normal: {
-              width: 0,
-            },
-          },
-          areaStyle: {
-            normal: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                offset: 0,
-                color: earningLineTheme.gradFrom,
-              }, {
-                offset: 1,
-                color: earningLineTheme.gradTo,
-              }]),
-              opacity: 1,
-            },
-          },
-          data: this.liveUpdateChartData,
-        },
-      ],
-      animation: true,
-    };
-  }
-
-  updateChartOptions(chartData: { value: [string, number] }[]) {
-    this.echartsInstance.setOption({
-      series: [{
-        data: chartData,
-      }],
-    });
-  }
-
-  onChartInit(ec) {
-    this.echartsInstance = ec;
-  }
-
-  resizeChart() {
-    if (this.echartsInstance) {
-      this.echartsInstance.resize();
-    }
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
-  }
+function StreamingPlugin(StreamingPlugin: any) {
+  throw new Error('Function not implemented.');
 }
