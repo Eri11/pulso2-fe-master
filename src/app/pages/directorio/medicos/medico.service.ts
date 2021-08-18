@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, OnInit } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Medico } from './medico';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class MedicosService {
+export class MedicosService implements OnInit {
 
   //constructor( private http: HttpClient) { }
 
@@ -21,6 +21,22 @@ export class MedicosService {
 
 
   medicos: Medico[] = [];
+
+  ngOnInit(): void {
+ 
+    this.httpClient.get<Medico[]>('http://localhost/medico').subscribe(
+      data => {
+        this.medicos = data;
+        console.log(this.medicos);
+    },
+    (err: HttpErrorResponse) => {
+      if (err.error instanceof Error) {
+        console.log("Client-side error occured.");
+      } else {
+        console.log("Server-side error occured.");
+      }
+    });
+  }
 
   selectedPaciente: Medico = {
     nombre: '',

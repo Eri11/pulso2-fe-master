@@ -7,8 +7,12 @@ import { LocalDataSource, ServerDataSource } from 'ng2-smart-table';
   //templateUrl: './medicos.component.html',
   styleUrls: ['./medicos.component.scss'],
   template: `
-    <input #search class="search" type="text" placeholder="Search..." (keydown.enter)="onSearch(search.value)">
-    <ng2-smart-table [settings]="settings" [source]="source"></ng2-smart-table>
+    <ng2-smart-table 
+    [settings]="settings" 
+    [source]="source"
+    (deleteConfirm)="onDeleteConfirm($event)"
+    (editConfirm)="onSaveConfirm($event)"
+    (createConfirm)="onCreateConfirm($event)"></ng2-smart-table>
   `
 })
 export class MedicosComponent  {
@@ -25,11 +29,13 @@ export class MedicosComponent  {
       addButtonContent: '<i class="nb-plus"></i>',
       createButtonContent: '<i class="nb-checkmark"></i>',
       cancelButtonContent: '<i class="nb-close"></i>',
+      confirmCreate:true,
     },
     edit: {
       editButtonContent: '<i class="nb-edit"></i>',
       saveButtonContent: '<i class="nb-checkmark"></i>',
       cancelButtonContent: '<i class="nb-close"></i>',
+      confirmSave: true,
     },
     delete: {
       deleteButtonContent: '<i class="nb-trash"></i>',
@@ -39,7 +45,7 @@ export class MedicosComponent  {
         nombre: {
         title: 'Nombre',
         type: 'string',
-        filter: false
+        filter: false,
       },
       a_paterno: {
         title: 'Apellido Paterno',
@@ -61,13 +67,15 @@ export class MedicosComponent  {
       ced_profesional: {
         title: 'CED',
         type: 'string',
-        filter: false
+        filter: false,
+        editable: false,
+        addable: false,
 
       },
     },
   };
 
-  onDeleteConfirm(event): void {
+  onDeleteConfirm(event) {
     if (window.confirm('Are you sure you want to delete?')) {
       event.confirm.resolve();
     } else {
@@ -75,7 +83,36 @@ export class MedicosComponent  {
     }
   }
 
-  onSearch(query: string = '') {
+
+  onSaveConfirm(event) {
+    if (window.confirm('Are you sure you want to save?')) {
+      event.newData['nombre'] += ' + added in code';
+      event.confirm.resolve(event.newData);
+    } else {
+      event.confirm.reject();
+    }
+  }
+
+  onCreateConfirm(event) {
+    if (window.confirm('Are you sure you want to create?')) {
+      event.newData['nombre'] += ' + added in code';
+      event.confirm.resolve(event.newData);
+    } else {
+      event.confirm.reject();
+    }
+  }
+
+  /* 
+  
+  onDeleteConfirm(event): void {
+    if (window.confirm('Are you sure you want to delete?')) {
+      event.confirm.resolve();
+    } else {
+      event.confirm.reject();
+    }
+  } */
+
+ /*  onSearch(query: string = '') {
     this.source.setFilter([
       // fields we want to include in the search
       {
@@ -90,11 +127,11 @@ export class MedicosComponent  {
         field: 'email',
         search: query
       }
-    ], false); 
+    ], false);  
     // second parameter specifying whether to perform 'AND' or 'OR' search 
     // (meaning all columns should contain search query or at least one)
     // 'AND' by default, so changing to 'OR' by setting false here
-  }
+  }*/
   
 
 
