@@ -1,21 +1,22 @@
 <nb-card-header>
-    <i class="ion-social-usd"></i>
-    <span class="title">Profit</span>
+    <i class="ion-user"></i>
+    <span class="title">Perfil</span>
 </nb-card-header>
 <nb-card-body>
-    <div class="info">
-        <div class="period">
-            <div class="caption">Jun 1 - Jun 30</div>
-            <div class="label">
-                <span class="currency">$</span>300
+
+    <form>
+        <div class="form-group row">
+            <label for="inputEmail1" class="label col-sm-3 col-form-label">Email</label>
+            <div class="col-sm-9">
+                <input type="email" nbInput fullWidth id="inputEmail1" placeholder="Email">
             </div>
         </div>
-        <div class="period latest">
-            <div class="caption">Jul 1 - Jul 31</div>
-            <div class="label">
-                <span class="currency">$</span>860
+        <div class="form-group row">
+            <label for="inputPassword2" class="label col-sm-3 col-form-label">Password</label>
+            <div class="col-sm-9">
+                <input type="password" nbInput fullWidth id="inputPassword2" placeholder="Password">
             </div>
         </div>
-    </div>
-    <ngx-back-profile-chart [points]="chartData"></ngx-back-profile-chart>
+
+    </form>
 </nb-card-body>

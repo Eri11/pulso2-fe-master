@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { NbCardModule, NbUserModule, NbButtonModule, NbIconModule, NbTabsetModule, NbSelectModule, NbListModule, NbFlipCardComponent, NbCardComponent, NbProgressBarModule } from '@nebular/theme';
+import { NbCardModule, NbUserModule, NbButtonModule, NbIconModule, NbTabsetModule, NbSelectModule, NbListModule, NbFlipCardComponent, NbCardComponent, NbProgressBarModule, NbCheckboxComponent } from '@nebular/theme';
 
 import { ThemeModule } from '../../@theme/theme.module';
 import { DeviceFlipCardComponent } from './device-flip-card/device-flip-card.component';
@@ -48,7 +48,10 @@ import { NgxEchartsModule } from 'ngx-echarts';
     FrontComponent,
     FrontLiveStatsChartComponent,
     BackComponent,
-    BackProfileChartComponent
+    BackProfileChartComponent,
+
+    
+
     
 
   ],
@@ -59,7 +62,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
     BackComponent,
     BackProfileChartComponent
     
-
+    
   ],
 
 })
