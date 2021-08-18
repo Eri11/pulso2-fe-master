@@ -1,6 +1,8 @@
-import { HttpClient, } from '@angular/common/http';
+import { HttpClient,HttpErrorResponse} from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { LocalDataSource, ServerDataSource } from 'ng2-smart-table';
+import { ServerDataSource } from 'ng2-smart-table';
+import { Medico } from './medico';
+import { MedicosService } from './medico.service';
 
 @Component({
   selector: 'ngx-medicos',
@@ -10,32 +12,34 @@ import { LocalDataSource, ServerDataSource } from 'ng2-smart-table';
     <ng2-smart-table 
     [settings]="settings" 
     [source]="source"
-    (deleteConfirm)="onDeleteConfirm($event)"
-    (editConfirm)="onSaveConfirm($event)"
+ 
     (createConfirm)="onCreateConfirm($event)"></ng2-smart-table>
   `
+/* 
+  (deleteConfirm)="onDeleteConfirm($event)"
+  (editConfirm)="onSaveConfirm($event)" */
 })
 export class MedicosComponent  {
-
+  medico: Medico;
   source: ServerDataSource;
 
-    constructor(http: HttpClient) {
+    constructor(http: HttpClient, private medicosService: MedicosService) {
       this.source = new ServerDataSource(http, { endPoint: 'http://localhost/medico' });
+      this.medico = new Medico();
     }
 
 
   settings = {   
     add: {
       addButtonContent: '<i class="nb-plus"></i>',
-      createButtonContent: '<i class="nb-checkmark"></i>',
+      createButtonContent: '<i (click)="create()" class="nb-checkmark" ></i>',
       cancelButtonContent: '<i class="nb-close"></i>',
-      confirmCreate:true,
+      confirmCreate: true,
     },
     edit: {
       editButtonContent: '<i class="nb-edit"></i>',
-      saveButtonContent: '<i class="nb-checkmark"></i>',
+      saveButtonContent: '<i class="nb-checkmark" ></i> ',
       cancelButtonContent: '<i class="nb-close"></i>',
-      confirmSave: true,
     },
     delete: {
       deleteButtonContent: '<i class="nb-trash"></i>',
@@ -46,6 +50,7 @@ export class MedicosComponent  {
         title: 'Nombre',
         type: 'string',
         filter: false,
+        
       },
       a_paterno: {
         title: 'Apellido Paterno',
@@ -67,52 +72,21 @@ export class MedicosComponent  {
       ced_profesional: {
         title: 'CED',
         type: 'string',
-        filter: false,
-        editable: false,
-        addable: false,
+        filter: false
 
       },
     },
   };
 
-  onDeleteConfirm(event) {
-    if (window.confirm('Are you sure you want to delete?')) {
-      event.confirm.resolve();
-    } else {
-      event.confirm.reject();
-    }
-  }
-
-
-  onSaveConfirm(event) {
-    if (window.confirm('Are you sure you want to save?')) {
-      event.newData['nombre'] += ' + added in code';
-      event.confirm.resolve(event.newData);
-    } else {
-      event.confirm.reject();
-    }
-  }
-
-  onCreateConfirm(event) {
-    if (window.confirm('Are you sure you want to create?')) {
-      event.newData['nombre'] += ' + added in code';
-      event.confirm.resolve(event.newData);
-    } else {
-      event.confirm.reject();
-    }
-  }
-
-  /* 
-  
   onDeleteConfirm(event): void {
     if (window.confirm('Are you sure you want to delete?')) {
       event.confirm.resolve();
     } else {
       event.confirm.reject();
     }
-  } */
+  }
 
- /*  onSearch(query: string = '') {
+  onSearch(query: string = '') {
     this.source.setFilter([
       // fields we want to include in the search
       {
@@ -127,13 +101,43 @@ export class MedicosComponent  {
         field: 'email',
         search: query
       }
-    ], false);  
+    ], false); 
     // second parameter specifying whether to perform 'AND' or 'OR' search 
     // (meaning all columns should contain search query or at least one)
     // 'AND' by default, so changing to 'OR' by setting false here
-  }*/
-  
+  }
+  /*
+  onCreateConfirm(event) {
+    const data = {"nombre" : event.newData.employee_name,
+                "a paterno" : event.newData.employee_salary
+                };
+    this.medicosService.createMedico(data).subscribe();        
+    }
 
+*/
+
+  
+  onCreateConfirm(event) {
+    if (window.confirm('Are you sure you want to save?')) {
+      //call to remote api, remember that you have to await this
+      const data = {"nombre" : event.newData.nombre,
+                "a_paterno" : event.newData.a_paterno
+                };
+      event.confirm.resolve(this.create(data));
+    } else {
+      event.confirm.reject();
+    }
+  }
+
+  create(data: any) {
+    const medicoData = {
+      nombre: data.nombre,
+      a_paterno: data.a_paterno
+    };
+    this.medicosService.createMedico(medicoData).subscribe();
+   // this.get();
+  // return "lol"
+  }
 
     
 }
