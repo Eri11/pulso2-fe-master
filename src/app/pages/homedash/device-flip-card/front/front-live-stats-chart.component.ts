@@ -1,30 +1,27 @@
-import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
+import { delay, takeWhile } from 'rxjs/operators';
+import { AfterViewInit, Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { NbThemeService } from '@nebular/theme';
-import { takeWhile } from 'rxjs/operators';
-import { LayoutService } from '../../../../@core/utils';
+import { LayoutService } from '../../../../@core/utils/layout.service';
+
 
 @Component({
   selector: 'ngx-front-stats-animation-chart',
   template: `
     <div echarts
-         [options]="options"
+         [options]="option"
          class="echart"
          (chartInit)="onChartInit($event)">
     </div>
   `,
 })
 
-export class FrontLiveStatsChartComponent implements AfterViewInit, OnDestroy  {
-
+export class FrontLiveStatsChartComponent implements AfterViewInit, OnDestroy, OnChanges {
   private alive = true;
 
-  @Input() linesData: { firstLine: number[]; secondLine: number[] } = {
-    firstLine: [],
-    secondLine: [],
-  };
+  @Input() liveUpdateChartData: { value: [string, number] }[];
 
-  echartsInstance: any;
-  options: any = {};
+  option: any;
+  echartsInstance;
 
   constructor(private theme: NbThemeService,
               private layoutService: LayoutService) {
@@ -35,36 +32,61 @@ export class FrontLiveStatsChartComponent implements AfterViewInit, OnDestroy  {
       .subscribe(() => this.resizeChart());
   }
 
-  ngAfterViewInit() {
-    this.theme.getJsTheme()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(config => {
-        const profitBarAnimationEchart: any = config.variables.profitBarAnimationEchart;
-
-        this.setChartOption(profitBarAnimationEchart);
-    });
+  ngOnChanges(): void {
+    if (this.option) {
+      this.updateChartOptions(this.liveUpdateChartData);
+    }
   }
 
-  setChartOption(chartVariables) {
-    this.options = {
-      color: [
-        chartVariables.firstAnimationBarColor,
-        chartVariables.secondAnimationBarColor,
-      ],
+  ngAfterViewInit() {
+    this.theme.getJsTheme()
+      .pipe(
+        delay(1),
+        takeWhile(() => this.alive),
+      )
+      .subscribe(config => {
+        const earningLineTheme: any = config.variables.earningLine;
+
+        this.setChartOption(earningLineTheme);
+      });
+  }
+
+  setChartOption(earningLineTheme) {
+    this.option = {
       grid: {
         left: 0,
         top: 0,
         right: 0,
         bottom: 0,
       },
-      legend: {
-        data: ['transactions', 'orders'],
-        borderWidth: 0,
-        borderRadius: 0,
-        itemWidth: 15,
-        itemHeight: 15,
-        textStyle: {
-          color: chartVariables.textColor,
+      xAxis: {
+        type: 'time',
+        axisLine: {
+          show: false,
+        },
+        axisLabel: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          show: false,
+        },
+      },
+      yAxis: {
+        boundaryGap: [0, '5%'],
+        axisLine: {
+          show: false,
+        },
+        axisLabel: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          show: false,
         },
       },
       tooltip: {
@@ -72,74 +94,64 @@ export class FrontLiveStatsChartComponent implements AfterViewInit, OnDestroy  {
           type: 'shadow',
         },
         textStyle: {
-          color: chartVariables.tooltipTextColor,
-          fontWeight: chartVariables.tooltipFontWeight,
-          fontSize: chartVariables.tooltipFontSize,
+          color: earningLineTheme.tooltipTextColor,
+          fontWeight: earningLineTheme.tooltipFontWeight,
+          fontSize: earningLineTheme.tooltipFontSize,
         },
         position: 'top',
-        backgroundColor: chartVariables.tooltipBg,
-        borderColor: chartVariables.tooltipBorderColor,
-        borderWidth: chartVariables.tooltipBorderWidth,
-        formatter: params => `$ ${Math.round(parseInt(params.value, 10))}`,
-        extraCssText: chartVariables.tooltipExtraCss,
+        backgroundColor: earningLineTheme.tooltipBg,
+        borderColor: earningLineTheme.tooltipBorderColor,
+        borderWidth: earningLineTheme.tooltipBorderWidth,
+        formatter: params => `$ ${Math.round(parseInt(params.value[1], 10))}`,
+        extraCssText: earningLineTheme.tooltipExtraCss,
       },
-      xAxis: [
-        {
-          data: this.linesData.firstLine.map((_, index) => index),
-          silent: false,
-          axisLine: {
-            show: false,
-          },
-          axisLabel: {
-            show: false,
-          },
-          axisTick: {
-            show: false,
-          },
-        },
-      ],
-      yAxis: [
-        {
-          axisLine: {
-            show: false,
-          },
-          axisLabel: {
-            show: false,
-          },
-          axisTick: {
-            show: false,
-          },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              color: chartVariables.splitLineStyleColor,
-              opacity: chartVariables.splitLineStyleOpacity,
-              width: chartVariables.splitLineStyleWidth,
-            },
-          },
-        },
-      ],
       series: [
         {
-          name: 'transactions',
-          type: 'bar',
-          data: this.linesData.firstLine,
-          animationDelay: idx => idx * 10,
-        },
-        {
-          name: 'orders',
-          type: 'bar',
-          data: this.linesData.secondLine,
-          animationDelay: idx => idx * 10 + 100,
+          type: 'line',
+          symbol: 'circle',
+          sampling: 'average',
+          itemStyle: {
+            normal: {
+              opacity: 0,
+            },
+            emphasis: {
+              opacity: 0,
+            },
+          },
+          lineStyle: {
+            normal: {
+              width: 0,
+            },
+          },
+          areaStyle: {
+            normal: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                offset: 0,
+                color: earningLineTheme.gradFrom,
+              }, {
+                offset: 1,
+                color: earningLineTheme.gradTo,
+              }]),
+              opacity: 1,
+            },
+          },
+          data: this.liveUpdateChartData,
         },
       ],
-      animationEasing: 'elasticOut',
-      animationDelayUpdate: idx => idx * 5,
+      animation: true,
     };
   }
 
-  onChartInit(echarts) {
-    this.echartsInstance = echarts;
+  updateChartOptions(chartData: { value: [string, number] }[]) {
+    this.echartsInstance.setOption({
+      series: [{
+        data: chartData,
+      }],
+    });
+  }
+
+  onChartInit(ec) {
+    this.echartsInstance = ec;
   }
 
   resizeChart() {
@@ -148,7 +160,70 @@ export class FrontLiveStatsChartComponent implements AfterViewInit, OnDestroy  {
     }
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy() {
     this.alive = false;
   }
 }
+
+
+
+/**import { Component } from '@angular/core';
+import 'chartjs-plugin-streaming';
+
+@Component({
+  selector: 'app-tab2',
+  templateUrl: 'tab2.page.html',
+  styleUrls: ['tab2.page.scss']
+})
+export class Tab2Page {
+
+  myDataFromServer:number=20;
+  updateMyDataFromServerFunction:any;
+
+  datasets: any[] = [{
+    data: []
+  }, {
+    data: []
+  }];
+
+  options: any;
+  constructor( ) {}
+
+  ngOnInit(){
+
+    this.options= {
+      scales: {
+        xAxes: [{
+          type: 'realtime',
+          realtime: {
+            onRefresh: (chart: any) =>{
+              chart.data.datasets.forEach((dataset: any) => {  
+                dataset.data.push({
+                  x: Date.now(),
+                  y:this.myDataFromServer
+                });
+              });
+            },
+            delay: 2000
+          }
+        }],
+        yAxes: [{
+          ticks: {
+            max:100,
+            min:0
+          }
+        }]
+      }
+    };
+    this.updateMyDataFromServer();
+  }
+
+  updateMyDataFromServer(){
+    console.log('updateMyDataFromServer() called');    
+    this.updateMyDataFromServerFunction = setInterval(() => {
+      console.log('called');
+      this.myDataFromServer = Math.random() * 100;
+      console.log(this.myDataFromServer,'this.myDataFromServer');
+    },1000)
+  }
+} */

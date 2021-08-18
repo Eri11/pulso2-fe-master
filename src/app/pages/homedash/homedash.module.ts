@@ -36,7 +36,6 @@ import { NgxEchartsModule } from 'ngx-echarts';
     ChartModule,
     NgxEchartsModule,
     NgxChartsModule,
-    LeafletModule 
   ],
   declarations: [
     HomedashComponent,

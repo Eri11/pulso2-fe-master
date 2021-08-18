@@ -1,6 +1,6 @@
-import { HttpClient,HttpErrorResponse} from '@angular/common/http';
+import { HttpClient, } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ServerDataSource } from 'ng2-smart-table';
+import { LocalDataSource, ServerDataSource } from 'ng2-smart-table';
 import { Medico } from './medico';
 import { MedicosService } from './medico.service';
 
@@ -9,16 +9,17 @@ import { MedicosService } from './medico.service';
   //templateUrl: './medicos.component.html',
   styleUrls: ['./medicos.component.scss'],
   template: `
-    <ng2-smart-table 
-    [settings]="settings" 
-    [source]="source"
- 
-    (createConfirm)="onCreateConfirm($event)"></ng2-smart-table>
+  <ng2-smart-table 
+  [settings]="settings" 
+  (createConfirm)="onCreateConfirm($event)" 
+  (editConfirm)="onEditConfirm($event)"
+  (deleteConfirm)="onDeleteConfirm($event)"  
+  [source]="source">
+  </ng2-smart-table>
   `
-/* 
-  (deleteConfirm)="onDeleteConfirm($event)"
-  (editConfirm)="onSaveConfirm($event)" */
 })
+
+
 export class MedicosComponent  {
   medico: Medico;
   source: ServerDataSource;
@@ -40,12 +41,21 @@ export class MedicosComponent  {
       editButtonContent: '<i class="nb-edit"></i>',
       saveButtonContent: '<i class="nb-checkmark" ></i> ',
       cancelButtonContent: '<i class="nb-close"></i>',
+      confirmSave: true,
     },
     delete: {
       deleteButtonContent: '<i class="nb-trash"></i>',
       confirmDelete: true,
+      
     },
     columns: {
+      id: {
+        title: '_id',
+        type: 'string',
+        filter: false,
+        editable: false,
+        
+      },
         nombre: {
         title: 'Nombre',
         type: 'string',
@@ -80,12 +90,34 @@ export class MedicosComponent  {
 
   onDeleteConfirm(event): void {
     if (window.confirm('Are you sure you want to delete?')) {
-      event.confirm.resolve();
+      const id = {"id" : event.data.id};
+      event.confirm.resolve(this.delete(id));
     } else {
       event.confirm.reject();
     }
   }
-
+  onCreateConfirm(event) {
+    if (window.confirm('Are you sure you want to save?')) {
+      //call to remote api, remember that you have to await this
+      const data = {"nombre" : event.newData.nombre,
+                "a_paterno" : event.newData.a_paterno
+                };
+      event.confirm.resolve(this.create(data));
+    } else {
+      event.confirm.reject();
+    }
+  }
+  onEditConfirm(event) {
+    if (window.confirm('Are you sure you want to save?')) {
+      //call to remote api, remember that you have to await this
+      const newdata = {"id": event.data.id ,nombre : event.newData.nombre,
+                a_paterno : event.newData.a_paterno
+                };
+      event.confirm.resolve(this.edit(newdata));
+    } else {
+      event.confirm.reject();
+    }
+  }
   onSearch(query: string = '') {
     this.source.setFilter([
       // fields we want to include in the search
@@ -106,28 +138,10 @@ export class MedicosComponent  {
     // (meaning all columns should contain search query or at least one)
     // 'AND' by default, so changing to 'OR' by setting false here
   }
-  /*
-  onCreateConfirm(event) {
-    const data = {"nombre" : event.newData.employee_name,
-                "a paterno" : event.newData.employee_salary
-                };
-    this.medicosService.createMedico(data).subscribe();        
-    }
-
-*/
+  
 
   
-  onCreateConfirm(event) {
-    if (window.confirm('Are you sure you want to save?')) {
-      //call to remote api, remember that you have to await this
-      const data = {"nombre" : event.newData.nombre,
-                "a_paterno" : event.newData.a_paterno
-                };
-      event.confirm.resolve(this.create(data));
-    } else {
-      event.confirm.reject();
-    }
-  }
+  
 
   create(data: any) {
     const medicoData = {
@@ -135,9 +149,19 @@ export class MedicosComponent  {
       a_paterno: data.a_paterno
     };
     this.medicosService.createMedico(medicoData).subscribe();
-   // this.get();
-  // return "lol"
   }
 
-    
+  edit(data: any) {
+    const medicoData = {
+      id: data.id,
+      nombre: data.nombre,
+      a_paterno: data.a_paterno
+    };
+    this.medicosService.editMedico(medicoData).subscribe();
+  }
+
+  delete(id_m: any) {
+    this.medicosService.deleteMedico(id_m).subscribe();
+    //this.get();
+  }
 }

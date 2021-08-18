@@ -1,159 +1,182 @@
-import { query } from '@angular/animations';
+import { HttpClient, } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { LocalDataSource } from 'ng2-smart-table';
+import { LocalDataSource, ServerDataSource } from 'ng2-smart-table';
+import { Empleado } from './empleado';
+import { EmpleadoService } from './empleado.service';
 
 
 @Component({
   selector: 'ngx-empleados',
-  templateUrl: './empleados.component.html',
-  styleUrls: ['./empleados.component.scss'] 
-/*  template: `
-    <input #search class="search" type="text" placeholder="Search..." (keydown.enter)="onSearch(search.value)">
-    <ng2-smart-table [settings]="settings" [source]="source"></ng2-smart-table>
-  `*/
+  styleUrls: ['./empleados.component.scss'],
+  template: `
+  <ng2-smart-table 
+  [settings]="settings" 
+  (createConfirm)="onCreateConfirm($event)" 
+  (editConfirm)="onEditConfirm($event)"
+  (deleteConfirm)="onDeleteConfirm($event)"  
+  [source]="source">
+  </ng2-smart-table>
+  `
 })
+
 export class EmpleadosComponent {
 
-  settings = {
+  empleado: Empleado;
+  source: ServerDataSource;
+
+    constructor(http: HttpClient, private empleadoService: EmpleadoService) {
+      this.source = new ServerDataSource(http, { endPoint: 'http://localhost/empleado' });
+      this.empleado = new Empleado();
+    }
+
+
+  settings = {   
     add: {
       addButtonContent: '<i class="nb-plus"></i>',
-      createButtonContent: '<i class="nb-checkmark"></i>',
+      createButtonContent: '<i class="nb-checkmark" ></i>',
       cancelButtonContent: '<i class="nb-close"></i>',
+      confirmCreate: true,
     },
     edit: {
       editButtonContent: '<i class="nb-edit"></i>',
-      saveButtonContent: '<i class="nb-checkmark"></i>',
+      saveButtonContent: '<i class="nb-checkmark" ></i> ',
       cancelButtonContent: '<i class="nb-close"></i>',
+      confirmSave: true,
     },
     delete: {
       deleteButtonContent: '<i class="nb-trash"></i>',
       confirmDelete: true,
+      
     },
     columns: {
       id: {
-        title: 'ID',
+        title: '_id',
+        type: 'string',
         filter: false,
+        editable: false,
+        
       },
-      name: {
-        title: 'Full Name',
+        nombre: {
+        title: 'Nombre',
+        type: 'string',
         filter: false,
+        
       },
-      username: {
-        title: 'User Name',
-        filter: false,
+      a_paterno: {
+        title: 'Apellido Paterno',
+        type: 'string',
+        filter: false
       },
-      email: {
-        title: 'Email',
-        filter: false,
+      a_materno: {
+        title: 'Apellido Materno',
+        type: 'string',
+        filter: false
+
+      },
+      correo: {
+        title: 'Correo',
+        type: 'string',
+        filter: false
+      },
+      passwd: {
+        title: 'passwd',
+        type: 'string',
+        filter: false
+
+      },
+      tipo_usuario: {
+        title: 'tipo_usuario',
+        type: 'string',
+        filter: false
+
       },
     },
   };
 
-  data = [
-    {
-      id: 1,
-      name: 'Leanne Graham',
-      username: 'Bret',
-      email: 'Sincere@april.biz',
-    },
-    {
-      id: 2,
-      name: 'Ervin Howell',
-      username: 'Antonette',
-      email: 'Shanna@melissa.tv',
-    },
-    {
-      id: 3,
-      name: 'Clementine Bauch',
-      username: 'Samantha',
-      email: 'Nathan@yesenia.net',
-    },
-    {
-      id: 4,
-      name: 'Patricia Lebsack',
-      username: 'Karianne',
-      email: 'Julianne.OConner@kory.org',
-    },
-    {
-      id: 5,
-      name: 'Chelsey Dietrich',
-      username: 'Kamren',
-      email: 'Lucio_Hettinger@annie.ca',
-    },
-    {
-      id: 6,
-      name: 'Mrs. Dennis Schulist',
-      username: 'Leopoldo_Corkery',
-      email: 'Karley_Dach@jasper.info',
-    },
-    {
-      id: 7,
-      name: 'Kurtis Weissnat',
-      username: 'Elwyn.Skiles',
-      email: 'Telly.Hoeger@billy.biz',
-    },
-    {
-      id: 8,
-      name: 'Nicholas Runolfsdottir V',
-      username: 'Maxime_Nienow',
-      email: 'Sherwood@rosamond.me',
-    },
-    {
-      id: 9,
-      name: 'Glenna Reichert',
-      username: 'Delphine',
-      email: 'Chaim_McDermott@dana.io',
-    },
-    {
-      id: 10,
-      name: 'Clementina DuBuque',
-      username: 'Moriah.Stanton',
-      email: 'Rey.Padberg@karina.biz',
-    },
-    {
-      id: 11,
-      name: 'Nicholas DuBuque',
-      username: 'Nicholas.Stanton',
-      email: 'Rey.Padberg@rosamond.biz',
-    },
-  ];
-
-  source: LocalDataSource;
-
-  constructor() {
-    this.source = new LocalDataSource(this.data);
-  }
-
-  onSearch(query: string = '') {
-    this.source.setFilter([
-      // fields we want to inclue in the search
-      {
-        field: 'id',
-        search: query,
-      },
-      {
-        field: 'name',
-        search: query,
-      },
-      {
-        field: 'username',
-        search: query,
-      },
-      {
-        field: 'email',
-        search: query,
-      },
-    ], false);
-    // second parameter specifying whether to perform 'AND' or 'OR' search
-    // (meaning all columns should contain search query or at least one)
-    // 'AND' by default, so changing to 'OR' by setting false here
-  }
-
   onDeleteConfirm(event): void {
-    if (window.confirm('¿Seguro que desea eliminar?')) {
-      event.confirm.resolve();
+    if (window.confirm('Are you sure you want to delete?')) {
+      const id = {"id" : event.data.id};
+      event.confirm.resolve(this.delete(id));
     } else {
       event.confirm.reject();
     }
+  }
+  onCreateConfirm(event) {
+    if (window.confirm('Are you sure you want to save?')) {
+      //call to remote api, remember that you have to await this
+      const data = {"nombre" : event.newData.nombre,
+                "a_paterno" : event.newData.a_paterno,
+                "a_materno": event.newData.a_materno,
+                "correo": event.newData.correo,
+                "passwd": event.newData.passwd,
+                "tipo_usuario": event.newData.tipo_usuario
+                };
+      event.confirm.resolve(this.create(data));
+    } else {
+      event.confirm.reject();
+    }
+  }
+  onEditConfirm(event) {
+    if (window.confirm('Are you sure you want to save?')) {
+      //call to remote api, remember that you have to await this
+      const newdata = {"id": event.data.id ,nombre : event.newData.nombre,
+                a_paterno : event.newData.a_paterno
+                };
+      event.confirm.resolve(this.edit(newdata));
+    } else {
+      event.confirm.reject();
+    }
+  }
+  onSearch(query: string = '') {
+    this.source.setFilter([
+      // fields we want to include in the search
+      {
+        field: 'nombre',
+        search: query
+      },
+      {
+        field: 'a_paterno',
+        search: query
+      },
+      {
+        field: 'email',
+        search: query
+      }
+    ], false); 
+    // second parameter specifying whether to perform 'AND' or 'OR' search 
+    // (meaning all columns should contain search query or at least one)
+    // 'AND' by default, so changing to 'OR' by setting false here
+  }
+  
+
+  
+  
+
+  create(data: any) {
+    const medicoData = {
+      nombre: data.nombre,
+      a_paterno: data.a_paterno,
+      a_materno: data.a_materno,
+      correo: data.correo,
+      passwd: data.passwd,
+      tipo_usuario: data.tipo_usuario
+    };
+    this.empleadoService.createEmpleado(medicoData).subscribe();
+  }
+
+  edit(data: any) {
+    const medicoData = {
+      id: data.id,
+      nombre: data.nombre,
+      a_paterno: data.a_paterno,
+      a_materno: data.a_materno,
+      correo: data.correo
+    };
+    this.empleadoService.editEmpleado(medicoData).subscribe();
+  }
+
+  delete(id_m: any) {
+    this.empleadoService.deleteEmpleado(id_m).subscribe();
+    //this.get();
   }
 }

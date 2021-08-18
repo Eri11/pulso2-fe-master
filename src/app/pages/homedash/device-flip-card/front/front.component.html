@@ -1,7 +1,9 @@
 <nb-card-header>
-    <i class="ion-social-usd"></i>
-    <span class="title">Profit</span>
+
+    <nb-icon icon="activity-outline" status="success" class="flip-icon" [options]="{ animation: { type: 'pulse' } }"></nb-icon>
+    <span class="title">Device: 01 </span>
+
 </nb-card-header>
 <nb-card-body>
-    <ngx-front-stats-animation-chart [linesData]="linesData"></ngx-front-stats-animation-chart>
+    <ngx-front-stats-animation-chart [liveUpdateChartData]="liveUpdateChartData"></ngx-front-stats-animation-chart>
 </nb-card-body>
